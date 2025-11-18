@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    background: url('23ea1d1c2ec477deebd114fc7054b54d957ad10b1e2c9347230cf47b5cb0e94e.png') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 50px;
+    font-weight: bold;
+    color: #0056b3;
+    font-family: 'Cambria', sans-serif;
+    cursor: pointer;
+}
+
+.header:hover .dropdown {
+    display: block;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    width: 150px;
+    z-index: 1;
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #033ab9;
+    font-size: 16px;
+}
+
+
+.button-container {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.container {
+    background: rgb(104, 29, 29);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+h2 {
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    background: #1e4b7c;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.lancar-desafio {
+    padding: 12px 20px;
+    right: 50px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+   
+}
+
+
+

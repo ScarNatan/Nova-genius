@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #2563eb;
+            --purple: #7c3aed;
+            --white: #ffffff;
+            --bg: #0b1020;
+            --card: #121730;
+            --muted: #9aa4b2;
+            --border: #1f2540;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #ef4444
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: linear-gradient(180deg, #0b1020 0%, #0e1430 100%);
+            color: #e5e7eb
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #0c1228;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .brand i {
+            color: var(--purple);
+            font-size: 22px
+        }
+
+        .brand span {
+            font-weight: 700
+        }
+
+        .nav {
+            padding: 10px
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 10px
+        }
+
+        .nav a:hover {
+            background: #121730;
+            color: #fff
+        }
+
+        .nav a.active {
+            background: linear-gradient(90deg, rgba(37, 99, 235, .2), rgba(124, 58, 237, .2));
+            color: #fff
+        }
+
+        .nav .section {
+            margin: 18px 12px 8px;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em
+        }
+
+        .cta {
+            margin: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, .15), rgba(124, 58, 237, .15));
+            border: 1px dashed var(--border)
+        }
+
+        .cta button {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(12, 18, 40, .7);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 10
+        }
+
+        .toggle {
+            display: none
+        }
+
+        .search {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: #cbd5e1
+        }
+
+        .search i {
+            margin-right: 8px;
+            color: var(--muted)
+        }
+
+        .search input {
+            flex: 1;
+            background: transparent;
+            border: 0;
+            outline: none;
+            color: #fff
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--purple))
+        }
+
+        .content {
+            padding: 20px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px
+        }
+
+        .card {
+            background: rgba(18, 23, 48, .9);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 16px
+        }
+
+        .card .sub {
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .hero {
+            grid-column: span 8;
+            background: linear-gradient(135deg, rgba(37, 99, 235, .25), rgba(124, 58, 237, .25));
+            padding: 24px
+        }
+
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: 24px
+        }
+
+        .hero p {
+            margin: 0;
+            color: #cbd5e1
+        }
+
+        .stats {
+            grid-column: span 4;
+            display: grid;
+            gap: 12px
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #0c1228;
+            border: 1px solid var(--border)
+        }
+
+        .stat i {
+            font-size: 18px
+        }
+
+        .columns {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: #0c1228;
+            border: 1px solid var(--border)
+        }
+
+        .item .meta {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .item .meta i {
+            color: var(--purple)
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px
+        }
+
+        .tag {
+            font-size: 11px;
+            color: #cbd5e1;
+            background: #121730;
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 999px
+        }
+
+        .messages {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .msg {
+            display: flex;
+            gap: 10px
+        }
+
+        .msg .bubble {
+            flex: 1;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 12px
+        }
+
+        .ai {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px
+        }
+
+        .ai input {
+            flex: 1;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff
+        }
+
+        .ai button {
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px
+        }
+
+        .file {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: #0c1228;
+            border: 1px solid var(--border)
+        }
+
+        .progress {
+            height: 8px;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            overflow: hidden
+        }
+
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            width: 60%
+        }
+
+        .rank {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .rank .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px
+        }
+
+        .footer {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        @media(max-width:1000px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: .2s ease
+            }
+
+            .sidebar.open {
+                transform: translateX(0)
+            }
+
+            .toggle {
+                display: inline-flex
+            }
+        }
+
+        @media(max-width:900px) {
+            .columns {
+                grid-template-columns: 1fr
+            }
+
+            .board {
+                grid-template-columns: 1fr
+            }
+
+            .hero {
+                grid-column: span 12
+            }
+
+            .stats {
+                grid-column: span 12
+            }
+        }
+
+        .req-grid {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px
+        }
+
+        .req-card h3 {
+            margin: 0 0 8px;
+            font-size: 18px
+        }
+
+        .req-card h4 {
+            margin: 14px 0 8px;
+            font-size: 13px;
+            color: #cbd5e1
+        }
+
+        .req-card ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .req-card li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px
+        }
+
+        .req-card li i {
+            color: var(--purple)
+        }
+
+        @media(max-width:900px) {
+            .req-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50
+        }
+
+        .modal.open {
+            display: flex
+        }
+
+        .modal .box {
+            width: 100%;
+            max-width: 520px;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .input {
+            width: 100%;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff
+        }
+
+        .select {
+            width: 100%;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff
+        }
+
+        .btn {
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .muted {
+            color: #9aa4b2;
+            font-size: 12px
+        }
+
+        .hidden {
+            display: none
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand"><i class="fas fa-brain"></i><span>Genius Hub</span></div>
+            <nav class="nav">
+                <div class="section">Navegação</div>
+                <a class="active" href="#"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="#biblioteca"><i class="fas fa-book"></i><span>Biblioteca</span></a>
+                <a href="#comunidade"><i class="fas fa-users"></i><span>Comunidade</span></a>
+                <a href="#chat"><i class="fas fa-comments"></i><span>Chat</span></a>
+                <a href="#ia"><i class="fas fa-robot"></i><span>Assistente IA</span></a>
+                <a href="#projetos"><i class="fas fa-project-diagram"></i><span>Projetos</span></a>
+                <a href="#gamificacao"><i class="fas fa-trophy"></i><span>Gamificação</span></a>
+                <a href="#desafios"><i class="fas fa-flag"></i><span>Desafios</span></a>
+                <div class="section">Acesso</div>
+                <div class="cta">
+                    <button id="loginBtn"><i class="fab fa-google"></i> Entrar com Google</button>
+                </div>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="topbar">
+                <button class="toggle" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+                <div class="search"><i class="fas fa-search"></i><input id="search"
+                        placeholder="Buscar conteúdos, pessoas e grupos"></div>
+                <div class="user">
+                    <div class="avatar"></div>
+                    <div>
+                        <div style="font-weight:600">Você</div>
+                        <div style="font-size:12px;color:var(--muted)">Inovador</div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="grid">
+                    <section class="card hero">
+                        <h1>Bem-vindo ao seu ecossistema de aprendizado</h1>
+                        <p>Conecte pessoas, ideias e ferramentas inteligentes em um só lugar.</p>
+                        <div style="margin-top:10px"><button id="editProfileBtn" class="btn"
+                                style="padding:8px 12px">Editar Perfil</button></div>
+                    </section>
+                    <section id="desafios" class="columns">
+                        <div class="card" style="grid-column:span 2">
+                            <h3><i class="fas fa-flag" style="color:var(--blue)"></i> Lista de desafios</h3>
+                            <div class="row" style="margin-bottom:10px"><input id="filterText" class="input"
+                                    placeholder="Filtrar por título"><select id="filterCat" class="select">
+                                    <option value="">Todas categorias</option>
+                                    <option>Logística</option>
+                                    <option>Tecnologia</option>
+                                    <option>Sustentabilidade</option>
+                                    <option>IA</option>
+                                </select></div>
+                            <div id="challengeList" class="list"></div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-plus-square" style="color:var(--purple)"></i> Criar desafio (Empresa)
+                            </h3>
+                            <div id="createChallenge">
+                                <input id="chTitle" class="input" placeholder="Título">
+                                <textarea id="chDesc" class="input" placeholder="Descrição" rows="5"></textarea>
+                                <select id="chCat" class="select">
+                                    <option>Logística</option>
+                                    <option>Tecnologia</option>
+                                    <option>Sustentabilidade</option>
+                                    <option>IA</option>
+                                </select>
+                                <label class="muted"><input type="checkbox" id="chFeatured"> Destaque na Home</label>
+                                <button id="createChBtn" class="btn" style="margin-top:10px">Criar</button>
+                            </div>
+                            <div id="companyPanel" class="hidden">
+                                <h4 style="margin:14px 0">Submissões</h4>
+                                <div id="submissionList" class="list"></div>
+                            </div>
+                        </div>
+                    </section>
+                  
+                           
+                     
+                        </div>
+                    </section>
+                    <div id="profileModal" class="modal">
+                        <div class="box">
+                            <h3>Editar Perfil</h3>
+                            <div class="row" style="margin-top:8px"><input id="pfName" class="input"
+                                    placeholder="Nome"><input id="pfInstitution" class="input"
+                                    placeholder="Instituição/Empresa"></div>
+                            <div class="row" style="margin-top:8px"><input id="pfBio" class="input" placeholder="Bio">
+                            </div>
+                            <div class="row" style="margin-top:8px"><input id="pfAvatar" type="file" class="input"
+                                    accept="image/*"></div>
+                            <div class="row" style="margin-top:10px"><button id="saveProfile"
+                                    class="btn">Salvar</button><button id="closeProfile" class="btn"
+                                    style="background:linear-gradient(90deg,#374151,#6b7280)">Fechar</button></div>
+                        </div>
+                    </div>
+                    <section id="requisitos" class="columns">
+
+                    </section>
+                    <section class="stats">
+                        <div class="stat"><i class="fas fa-fire" style="color:var(--warning)"></i>
+                            <div>
+                                <div style="font-weight:600">Atividades recentes</div>
+                                <div class="sub">12 novas interações</div>
+                            </div>
+                        </div>
+                        <div class="stat"><i class="fas fa-lightbulb" style="color:var(--success)"></i>
+                            <div>
+                                <div style="font-weight:600">Sugestões inteligentes</div>
+                                <div class="sub">Conteúdos para você</div>
+                            </div>
+                        </div>
+                        <div class="stat"><i class="fas fa-signal" style="color:var(--purple)"></i>
+                            <div>
+                                <div style="font-weight:600">Networking</div>
+                                <div class="sub">3 conexões relevantes</div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="biblioteca" class="columns">
+                        <div class="card">
+                            <h3><i class="fas fa-book" style="color:var(--blue)"></i> Biblioteca de conhecimento</h3>
+                            <div class="sub">Artigos, vídeos e cursos por categorias</div>
+                            <div class="list" id="contentList">
+                                <div class="item">
+                                    <div class="meta"><i class="fas fa-file-alt"></i>
+                                        <div>Artigo: Fundamentos de IA</div>
+                                    </div>
+                                    <div class="tags"><span class="tag">IA</span><span class="tag">Teoria</span></div>
+                                </div>
+                                <div class="item">
+                                    <div class="meta"><i class="fas fa-play"></i>
+                                        <div>Vídeo: Redes Neurais</div>
+                                    </div>
+                                    <div class="tags"><span class="tag">Machine Learning</span></div>
+                                </div>
+                                <div class="item">
+                                    <div class="meta"><i class="fas fa-graduation-cap"></i>
+                                        <div>Curso: Colaboração Remota</div>
+                                    </div>
+                                    <div class="tags"><span class="tag">Produtividade</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="comunidade" class="card">
+                            <h3><i class="fas fa-users" style="color:var(--purple)"></i> Comunidade interativa</h3>
+                            <div class="sub">Fóruns e grupos temáticos</div>
+                            <div class="list">
+                                <div class="item">
+                                    <div class="meta"><i class="fas fa-hashtag"></i>
+                                        <div>Grupo: Desenvolvedores IA</div>
+                                    </div><span class="tag">ativo</span>
+                                </div>
+                                <div class="item">
+                                    <div class="meta"><i class="fas fa-hashtag"></i>
+                                        <div>Fórum: Design System</div>
+                                    </div><span class="tag">novo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="chat" class="card">
+                            <h3><i class="fas fa-comments" style="color:var(--blue)"></i> Chat em tempo real</h3>
+                            <div class="messages">
+                                <div class="msg">
+                                    <div class="avatar" style="width:28px;height:28px"></div>
+                                    <div class="bubble">Olá! Vamos colaborar no projeto de recomendações?</div>
+                                </div>
+                                <div class="msg" style="justify-content:flex-end">
+                                    <div class="bubble">Sim, compartilhei um rascunho na área de Projetos.</div>
+                                </div>
+                                <div class="ai"><input id="chatInput" placeholder="Escreva uma mensagem"><button
+                                        id="sendBtn"><i class="fas fa-paper-plane"></i></button></div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="ia" class="columns">
+                        <div class="card">
+                            <h3><i class="fas fa-robot" style="color:var(--purple)"></i> Assistente inteligente</h3>
+                            <div class="sub">Faça perguntas e receba respostas contextualizadas</div>
+                            <div class="ai"><input id="aiPrompt" placeholder="Pergunte algo"><button
+                                    id="askBtn">Perguntar</button></div>
+                            <div id="aiResponses" class="messages" style="margin-top:8px"></div>
+                        </div>
+                        <div id="projetos" class="card">
+                            <h3><i class="fas fa-project-diagram" style="color:var(--blue)"></i> Projetos colaborativos
+                            </h3>
+                            <div class="sub">Espaços compartilhados com uploads e versões</div>
+                            <div class="row" style="margin-bottom:10px"><select id="projectSelect"
+                                    class="select"></select></div>
+                            <div id="projFileList" class="board"></div>
+                            <div class="row" style="margin-top:10px"><input id="projFileInput" type="file" multiple
+                                    class="input"><button id="projUploadBtn" class="btn">Enviar arquivos</button></div>
+                            <div style="margin-top:10px">
+                                <h4 style="margin:8px 0">Comentários</h4>
+                                <div id="projComments" class="list"></div>
+                                <div class="row" style="margin-top:8px"><input id="projCommentInput" class="input"
+                                        placeholder="Escreva um comentário"><button id="projCommentBtn"
+                                        class="btn">Comentar</button></div>
+                            </div>
+                        </div>
+                        <div id="gamificacao" class="card">
+                            <h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Gamificação</h3>
+                            <div class="sub">Pontos e conquistas por participação</div>
+                            <div class="rank">
+                                <div class="row">
+                                    <div class="meta"><i class="fas fa-user-circle" style="color:var(--blue)"></i>
+                                        <div>Alex</div>
+                                    </div>
+                                    <div>1.240 pts</div>
+                                </div>
+                                <div class="row">
+                                    <div class="meta"><i class="fas fa-user-circle" style="color:var(--purple)"></i>
+                                        <div>Bianca</div>
+                                    </div>
+                                    <div>1.050 pts</div>
+                                </div>
+                                <div class="row">
+                                    <div class="meta"><i class="fas fa-user-circle" style="color:var(--success)"></i>
+                                        <div>Caio</div>
+                                    </div>
+                                    <div>980 pts</div>
+                                </div>
+                            </div>
+                            <div class="footer">Interface moderna e minimalista com paleta vibrante em azul, roxo e
+                                branco.</div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        // =====================================
+// SISTEMA DE LOGIN (Aluno / Empresa)
+// =====================================
+
+// Simulação de usuários (você pode trocar por backend depois)
+const users = [
+    { email: "empresa@ghub.com", senha: "123", tipo: "empresa" },
+    { email: "aluno@ghub.com", senha: "123", tipo: "aluno" }
+];
+
+// Salvar usuário logado
+function login() {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    const user = users.find(u => u.email === email && u.senha === senha);
+
+    if (!user) {
+        alert("Email ou senha incorretos!");
+        return;
+    }
+
+    localStorage.setItem("usuarioLogado", JSON.stringify(user));
+
+    if (user.tipo === "empresa") {
+        window.location.href = "empresa.dashboard.html";
+    } else {
+        window.location.href = "aluno.dashboard.html";
+    }
+}
+
+
+
+// =====================================
+// PROTEGER TELAS (Somente empresa cria desafios)
+// =====================================
+
+function protegerTelaEmpresa() {
+    const user = JSON.parse(localStorage.getItem("usuarioLogado"));
+    if (!user || user.tipo !== "empresa") {
+        window.location.href = "login.html";
+    }
+}
+
+function protegerTelaAluno() {
+    const user = JSON.parse(localStorage.getItem("usuarioLogado"));
+    if (!user || user.tipo !== "aluno") {
+        window.location.href = "login.html";
+    }
+}
+
+
+
+// =====================================
+// CRIAR DESAFIO (Somente empresa)
+// =====================================
+
+function criarDesafio() {
+    const titulo = document.getElementById("titulo").value;
+    const descricao = document.getElementById("descricao").value;
+    const categoria = document.getElementById("categoria").value;
+    const destaque = document.getElementById("destaque").checked;
+
+    if (!titulo || !descricao) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    const novoDesafio = {
+        id: Date.now(),
+        titulo,
+        descricao,
+        categoria,
+        destaque
+    };
+
+    let desafios = JSON.parse(localStorage.getItem("desafios")) || [];
+    desafios.push(novoDesafio);
+
+    localStorage.setItem("desafios", JSON.stringify(desafios));
+
+    alert("Desafio criado com sucesso!");
+    location.reload();
+}
+
+
+
+// =====================================
+// LISTAR DESAFIOS (Para alunos)
+// =====================================
+
+function listarDesafiosAluno() {
+    const lista = document.getElementById("listaDesafios");
+    let desafios = JSON.parse(localStorage.getItem("desafios")) || [];
+
+    lista.innerHTML = "";
+
+    desafios.forEach(d => {
+        lista.innerHTML += `
+            <div class="card-desafio">
+                <h3>${d.titulo}</h3>
+                <p>${d.descricao}</p>
+                <span class="tag">${d.categoria}</span>
+                ${d.destaque ? "<span class='destaque'>🔥 Em destaque</span>" : ""}
+            </div>
+        `;
+    });
+}
+
+
+
+// =====================================
+// FILTRO DE DESAFIOS
+// =====================================
+
+function filtrarDesafios() {
+    const filtro = document.getElementById("filtroCategoria").value;
+    const lista = document.getElementById("listaDesafios");
+    let desafios = JSON.parse(localStorage.getItem("desafios")) || [];
+
+    lista.innerHTML = "";
+
+    desafios
+        .filter(d => filtro === "todos" || d.categoria === filtro)
+        .forEach(d => {
+            lista.innerHTML += `
+            <div class="card-desafio">
+                <h3>${d.titulo}</h3>
+                <p>${d.descricao}</p>
+                <span class="tag">${d.categoria}</span>
+            </div>
+            `;
+        });
+}
+
+
+
+// =====================================
+// MODAL
+// =====================================
+
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = "flex";
+}
+
+function fecharModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = "none";
+}
+
+
+
+// =====================================
+// SIDEBAR
+// =====================================
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("aberta");
+}
+
+    </script>
+    <script>
+        // Projetos colaborativos: carregar projetos, arquivos e comentários
+        const API = 'http://localhost:3001'
+        function token() { return localStorage.getItem('gh_token') || '' }
+
+        async function api(path, opts = {}) {
+            const headers = { 'Content-Type': 'application/json', ...(token() ? { Authorization: 'Bearer ' + token() } : {}) }
+            const res = await fetch(API + path, { ...opts, credentials: 'include', headers: { ...headers, ...(opts.headers || {}) } })
+            if (!res.ok) {
+                const text = await res.text().catch(()=>'')
+                throw new Error(text || res.statusText || 'Erro')
+            }
+            const ct = res.headers.get('content-type') || ''
+            return ct.includes('application/json') ? res.json() : res.text()
+        }
+
+        async function loadProjects() {
+            try {
+                const list = await api('/api/projects')
+                const sel = document.getElementById('projectSelect')
+                sel.innerHTML = ''
+                list.forEach(p => {
+                    const opt = document.createElement('option')
+                    opt.value = p.id
+                    opt.textContent = p.name
+                    sel.appendChild(opt)
+                })
+                if (list.length) {
+                    sel.value = list[0].id
+                    loadProjectDetails(list[0].id)
+                } else {
+                    document.getElementById('projFileList').innerHTML = '<div class="muted">Nenhum projeto encontrado.</div>'
+                }
+            } catch (e) {
+                console.error('Erro carregando projetos', e)
+                // mostrar mensagens úteis e oferecer tentar novamente ou tentar sem credenciais
+                const filesEl = document.getElementById('projFileList')
+                filesEl.innerHTML = ''
+                const errDiv = document.createElement('div')
+                errDiv.className = 'muted'
+                errDiv.textContent = 'Erro carregando projetos.'
+                filesEl.appendChild(errDiv)
+                const btnRow = document.createElement('div')
+                btnRow.style.marginTop = '8px'
+                const retry = document.createElement('button')
+                retry.className = 'btn'
+                retry.textContent = 'Tentar novamente'
+                retry.onclick = () => { filesEl.innerHTML = 'Carregando...'; loadProjects() }
+                const fallback = document.createElement('button')
+                fallback.style.marginLeft = '8px'
+                fallback.className = 'btn'
+                fallback.textContent = 'Tentar sem credenciais'
+                fallback.onclick = async () => {
+                    filesEl.innerHTML = 'Tentando sem credenciais...'
+                    try {
+                        await loadProjectsFallback()
+                    } catch (err2) {
+                        filesEl.innerHTML = '<div class="muted">Falha ao carregar sem credenciais</div>'
+                    }
+                }
+                btnRow.appendChild(retry)
+                btnRow.appendChild(fallback)
+                filesEl.appendChild(btnRow)
+            }
+        }
+
+        // Fallback: tenta buscar projetos sem enviar cookies/credenciais (útil se CORS credentialed estiver bloqueando)
+        async function loadProjectsFallback() {
+            const sel = document.getElementById('projectSelect')
+            const filesEl = document.getElementById('projFileList')
+            try {
+                const r = await fetch(API + '/api/projects', { credentials: 'omit' })
+                if (!r.ok) {
+                    const t = await r.text().catch(()=>r.statusText)
+                    throw new Error(t || 'Erro')
+                }
+                const list = await r.json()
+                sel.innerHTML = ''
+                list.forEach(p => {
+                    const opt = document.createElement('option')
+                    opt.value = p.id
+                    opt.textContent = p.name
+                    sel.appendChild(opt)
+                })
+                if (list.length) {
+                    sel.value = list[0].id
+                    loadProjectDetails(list[0].id)
+                } else {
+                    filesEl.innerHTML = '<div class="muted">Nenhum projeto encontrado.</div>'
+                }
+            } catch (e) {
+                console.error('Fallback falhou', e)
+                throw e
+            }
+        }
+
+        async function loadProjectDetails(projectId) {
+            const filesEl = document.getElementById('projFileList')
+            const commentsEl = document.getElementById('projComments')
+            filesEl.innerHTML = 'Carregando...'
+            commentsEl.innerHTML = 'Carregando...'
+            try {
+                const files = await api(`/api/projects/${projectId}/files`)
+                filesEl.innerHTML = ''
+                if (!files.length) {
+                    filesEl.innerHTML = '<div class="muted">Nenhum arquivo</div>'
+                } else {
+                    files.forEach(f => {
+                        const div = document.createElement('div')
+                        div.className = 'file'
+                        div.innerHTML = `<div>${f.name} <div class="sub" style="font-size:12px">v${f.version} • ${new Date(f.createdAt||0).toLocaleString()}</div></div><div>${f.path?`<a href="${f.path}" target="_blank" style="color:#9aa4b2;text-decoration:none">Baixar</a>`:''}</div>`
+                        filesEl.appendChild(div)
+                    })
+                }
+            } catch (e) {
+                filesEl.innerHTML = '<div class="muted">Erro carregando arquivos</div>'
+            }
+            try {
+                const comments = await api(`/api/projects/${projectId}/comments`)
+                commentsEl.innerHTML = ''
+                if (!comments.length) commentsEl.innerHTML = '<div class="muted">Nenhum comentário</div>'
+                comments.forEach(c => {
+                    const div = document.createElement('div')
+                    div.className = 'item'
+                    div.innerHTML = `<div class="meta"><div>${c.text}</div></div><div class="sub">${new Date(c.ts||0).toLocaleString()}</div>`
+                    commentsEl.appendChild(div)
+                })
+            } catch (e) {
+                commentsEl.innerHTML = '<div class="muted">Erro carregando comentários</div>'
+            }
+        }
+
+        document.getElementById('projectSelect').addEventListener('change', (e) => loadProjectDetails(e.target.value))
+
+        // Upload de arquivos: converte para dataURL e envia como attachments
+        document.getElementById('projUploadBtn').addEventListener('click', async () => {
+            const input = document.getElementById('projFileInput')
+            const sel = document.getElementById('projectSelect')
+            const pid = sel.value
+            if (!pid) return alert('Selecione um projeto')
+            const files = Array.from(input.files || [])
+            if (!files.length) return alert('Selecione arquivos')
+            try {
+                const attachments = await Promise.all(files.map(f => new Promise((res, rej) => {
+                    const fr = new FileReader()
+                    fr.onload = () => res({ name: f.name, dataUrl: fr.result })
+                    fr.onerror = rej
+                    fr.readAsDataURL(f)
+                })))
+                await api(`/api/projects/${pid}/files`, { method: 'POST', body: JSON.stringify({ attachments }) })
+                alert('Arquivos enviados')
+                input.value = ''
+                loadProjectDetails(pid)
+            } catch (e) {
+                console.error(e)
+                alert('Erro ao enviar: ' + e.message)
+            }
+        })
+
+        // Comentar
+        document.getElementById('projCommentBtn').addEventListener('click', async () => {
+            const input = document.getElementById('projCommentInput')
+            const text = input.value.trim()
+            const pid = document.getElementById('projectSelect').value
+            if (!text) return alert('Escreva um comentário')
+            try {
+                await api(`/api/projects/${pid}/comments`, { method: 'POST', body: JSON.stringify({ text }) })
+                input.value = ''
+                loadProjectDetails(pid)
+            } catch (e) {
+                console.error(e)
+                alert('Erro ao enviar comentário: ' + e.message)
+            }
+        })
+
+        // Inicializa
+        // Botão de login com Google — abre fluxo OAuth no backend
+        try { document.getElementById('loginBtn').addEventListener('click', () => { window.location.href = API + '/api/auth/google' }) } catch(e) {}
+
+        // Assistente IA — envia prompt ao backend e mostra resposta
+        try {
+            document.getElementById('askBtn').addEventListener('click', async () => {
+                const prompt = (document.getElementById('aiPrompt').value || '').trim()
+                if (!prompt) return alert('Escreva uma pergunta')
+                const projSel = document.getElementById('projectSelect')
+                const projectId = projSel ? projSel.value : null
+                try {
+                    const respEl = document.getElementById('aiResponses')
+                    const userDiv = document.createElement('div')
+                    userDiv.className = 'msg'
+                    userDiv.innerHTML = `<div class="bubble" style="background:linear-gradient(90deg,#111827,#1f2937);text-align:right">${(prompt||'').replace(/</g,'&lt;')}</div>`
+                    respEl.prepend(userDiv)
+
+                    // create bot div and append empty bubble for streaming
+                    const botDiv = document.createElement('div')
+                    botDiv.className = 'msg'
+                    const bubble = document.createElement('div')
+                    bubble.className = 'bubble'
+                    bubble.textContent = ''
+                    botDiv.appendChild(bubble)
+                    respEl.prepend(botDiv)
+
+                    // stream response
+                    const r = await fetch(API + '/api/assistant/stream', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, projectId }) })
+                    if (!r.ok) {
+                        const txt = await r.text().catch(()=>'')
+                        throw new Error(txt || r.statusText)
+                    }
+                    const reader = r.body.getReader()
+                    const dec = new TextDecoder()
+                    let done = false
+                    let buffer = ''
+                    // show loading indicator
+                    bubble.textContent = '…'
+                    let sawAny = false
+                    const fallbackTimer = setTimeout(() => {
+                        if (!sawAny) {
+                            bubble.textContent = '(sem resposta)'
+                        }
+                    }, 8000)
+                    while (!done) {
+                        const { value, done: d } = await reader.read()
+                        done = d
+                        if (value) {
+                            sawAny = true
+                            const chunk = dec.decode(value)
+                            buffer += chunk
+                            // process complete SSE events separated by \n\n
+                            let idx
+                            while ((idx = buffer.indexOf('\n\n')) !== -1) {
+                                const event = buffer.slice(0, idx)
+                                buffer = buffer.slice(idx + 2)
+                                // each event may contain multiple lines; handle lines starting with 'data:'
+                                const lines = event.split('\n')
+                                lines.forEach(line => {
+                                    const l = line.trim()
+                                    if (!l) return
+                                    if (l.indexOf('data:') === 0) {
+                                        const payload = l.slice(5).trim()
+                                        try {
+                                            const obj = JSON.parse(payload)
+                                            if (obj.delta) {
+                                                // replace initial ellipsis if present
+                                                if (bubble.textContent === '…') bubble.textContent = ''
+                                                bubble.textContent += obj.delta
+                                            }
+                                        } catch (e) {
+                                            // ignore parse errors
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    clearTimeout(fallbackTimer)
+                    document.getElementById('aiPrompt').value = ''
+                } catch (err) {
+                    alert('Erro ao consultar assistente: ' + (err.message || err))
+                }
+            })
+        } catch(e) {}
+
+        loadProjects()
+    </script>
+    </body>
+
+</html>

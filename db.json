@@ -1,0 +1,80 @@
+{
+  "users": [
+    {
+      "id": "u-admin",
+      "email": "admin@genius.local",
+      "passwordHash": "e0556659d92b940f8106eeca7f8485a0:97d74bf2beb036c1cdc69c28f6293d49755f58af20461c0c29d7eff6618d37a5",
+      "role": "admin",
+      "name": "Admin",
+      "institution": "Genius",
+      "bio": "",
+      "avatar": "",
+      "points": 0,
+      "achievements": []
+    },
+    {
+      "id": "23fde60d-b3fb-4599-9fcc-fecd4c1923da",
+      "email": "xnatanx2016@outlook.com",
+      "passwordHash": "d2718822374215881daf2342e794f433:7b58d7c629c2a93c6e4568356168ac3294e25afd8d8779066fc0aba6b52ac1ef",
+      "role": "aluno",
+      "name": "",
+      "institution": "",
+      "bio": "",
+      "avatar": "",
+      "points": 0,
+      "achievements": []
+    },
+    {
+      "id": "42a6aeac-ff65-42d1-baef-71a3cc706e84",
+      "email": "node_test_1763484713151@local",
+      "passwordHash": "888d044da3a513d186fdd3d6800dbf86:3b24542efa0e06115b5eb04300baa060338081eb4f23ec27bfc1230be4af18a6",
+      "role": "aluno",
+      "name": "",
+      "institution": "",
+      "bio": "",
+      "avatar": "",
+      "points": 0,
+      "achievements": []
+    }
+  ],
+  "challenges": [],
+  "submissions": [],
+  "notifications": [],
+  "messages": [],
+  "projects": [
+    {
+      "id": "p-default",
+      "name": "Projeto Demo",
+      "ownerId": "u-admin",
+      "createdAt": 1763484713197
+    }
+  ],
+  "project_files": [
+    {
+      "id": "a9ad12ec-d26c-44f8-a24e-535bdc190649",
+      "projectId": "p-default",
+      "name": "Briefing.pdf",
+      "version": 2,
+      "path": "",
+      "createdAt": 1763484713198
+    },
+    {
+      "id": "71135f8c-b098-4bf3-ad5a-214773084561",
+      "projectId": "p-default",
+      "name": "prototipo.fig",
+      "version": 5,
+      "path": "",
+      "createdAt": 1763484713198
+    },
+    {
+      "id": "b79ab917-e1af-4384-8203-6fb74d42d9e3",
+      "projectId": "p-default",
+      "name": "Modelo Banner 9º Congresso de PI e 2º CONTTEX  90 x1.20 (1).pdf",
+      "version": 1,
+      "path": "/uploads/1763485327561-Modelo Banner 9º Congresso de PI e 2º CONTTEX  90 x1.20 (1).pdf",
+      "createdAt": 1763485327576,
+      "authorId": "23fde60d-b3fb-4599-9fcc-fecd4c1923da"
+    }
+  ],
+  "project_comments": []
+}

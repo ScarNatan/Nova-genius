@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • Genius Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #2563eb;
+            --purple: #7c3aed;
+            --bg: #0b1020;
+            --card: #121730;
+            --border: #1f2540;
+            --muted: #9aa4b2
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: linear-gradient(180deg, #0b1020 0%, #0e1430 100%);
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(18, 23, 48, .9);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--blue), var(--purple))
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .input,
+        .select {
+            width: 100%;
+            background: #0c1228;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff
+        }
+
+        .btn {
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border: 0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px
+        }
+
+        @media(max-width:480px) {
+            .row {
+                flex-direction: column
+            }
+
+            .container {
+                padding: 16px
+            }
+
+            .title {
+                font-size: 16px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="brand">
+            <div class="logo"></div>
+            <div class="title">Entrar no Genius Hub</div>
+        </div>
+        <form id="loginForm" autocomplete="on">
+            <div class="row"><input id="email" type="email" class="input" placeholder="E-mail" required></div>
+            <div class="row"><input id="password" type="password" class="input" placeholder="Senha" required></div>
+            <div class="row"><div id="passwordHint" class="muted" style="margin-top:6px;font-size:12px"></div></div>
+            <div id="formMessage" style="margin-top:12px"></div>
+            <div class="row"><select id="role" class="select">
+                    <option value="aluno">Aluno</option>
+                    <option value="empresa">Empresa</option>
+                    <option value="parceiro">Parceiro</option>
+                    <option value="admin">Admin</option>
+                </select></div>
+            <div class="actions"><button id="btnLogin" type="submit" class="btn">Entrar</button><button id="btnRegister" type="button" class="btn"
+                    style="background:linear-gradient(90deg,#16a34a,#22c55e)">Cadastrar</button><button id="btnRecover"
+                    type="button" class="btn" style="background:linear-gradient(90deg,#f59e0b,#f97316)">Recuperar senha</button></div>
+                <div style="margin-top:10px"><button id="googleLoginBtn" type="button" class="btn" style="background:linear-gradient(90deg,#4285F4,#3367D6);display:flex;align-items:center;gap:8px"><span style="font-weight:700">Entrar com Google</span></button></div>
+        </form>
+        <div class="links"><a href="index.html" class="muted" style="text-decoration:none">Voltar</a><span
+                class="muted">Selecione o perfil para cadastro</span></div>
+    </div>
+    <script>
+        const API = 'http://localhost:3001'
+        function token() { return localStorage.getItem('gh_token') || '' }
+
+        // UI helpers
+        function clearFormMessage() {
+            const fm = document.getElementById('formMessage')
+            fm.innerHTML = ''
+        }
+
+        function showFormMessage(type, text) {
+            // type: 'error' | 'success' | 'info'
+            const fm = document.getElementById('formMessage')
+            const color = type === 'error' ? '#f87171' : (type === 'success' ? '#34d399' : '#93c5fd')
+            fm.innerHTML = `<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);color:${color};font-size:14px">${text}</div>`
+        }
+
+        function setFieldError(id, text) {
+            let el = document.getElementById(id + 'Error')
+            if (!el) {
+                el = document.createElement('div')
+                el.id = id + 'Error'
+                el.style.color = '#f87171'
+                el.style.fontSize = '12px'
+                el.style.marginTop = '6px'
+                const input = document.getElementById(id)
+                input.parentNode.appendChild(el)
+            }
+            el.textContent = text
+        }
+
+        function clearFieldError(id) {
+            const el = document.getElementById(id + 'Error')
+            if (el) el.textContent = ''
+        }
+
+        async function api(path, opts = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(token() ? { Authorization: 'Bearer ' + token() } : {})
+            }
+            const res = await fetch(API + path, { ...opts, credentials: 'include', headers: { ...headers, ...(opts.headers || {}) } })
+            if (!res.ok) {
+                const text = await res.text()
+                throw new Error(text || 'Erro na requisição')
+            }
+            const ct = res.headers.get('content-type') || ''
+            return ct.includes('application/json') ? res.json() : res.text()
+        }
+
+        function validateEmail(email) {
+            // simples regex para validação básica
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        }
+
+        function validatePassword(pw) {
+            return pw && pw.length >= 6
+        }
+
+        async function handleRegister() {
+            clearFormMessage()
+            clearFieldError('email')
+            clearFieldError('password')
+            const email = document.getElementById('email').value.trim()
+            const password = document.getElementById('password').value.trim()
+            const role = document.getElementById('role').value
+            if (!email) return setFieldError('email', 'E-mail obrigatório')
+            if (!validateEmail(email)) return setFieldError('email', 'E-mail inválido')
+            if (!password) return setFieldError('password', 'Senha obrigatória')
+            if (!validatePassword(password)) return setFieldError('password', 'Senha deve ter ao menos 6 caracteres')
+            try {
+                const r = await api('/api/auth/register', { method: 'POST', body: JSON.stringify({ email, password, role }) })
+                localStorage.setItem('gh_token', r.token)
+                showFormMessage('success', 'Cadastro realizado — redirecionando...')
+                setTimeout(() => location.href = 'index.html', 700)
+            } catch (e) {
+                console.error('Register error', e)
+                // Se for falha de fetch (provavelmente CORS/preflight), tentar sem credenciais
+                if (e && String(e.message || '').includes('Failed to fetch')) {
+                    showFormMessage('error', 'Falha de rede/CORS. Tentando registrar sem credenciais...')
+                    try {
+                        const resp = await fetch(API + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, role }), credentials: 'omit' })
+                        if (!resp.ok) {
+                            const txt = await resp.text().catch(()=>resp.statusText)
+                            showFormMessage('error', 'Falha ao registrar (fallback): ' + (txt || resp.statusText))
+                        } else {
+                            const jr = await resp.json()
+                            localStorage.setItem('gh_token', jr.token)
+                            showFormMessage('success', 'Cadastro realizado (fallback) — redirecionando...')
+                            setTimeout(() => location.href = 'index.html', 700)
+                        }
+                    } catch (e2) {
+                        console.error('Register fallback error', e2)
+                        showFormMessage('error', 'Erro: ' + (e2.message || e2))
+                    }
+                } else {
+                    showFormMessage('error', 'Erro: ' + e.message)
+                }
+            }
+        }
+
+        async function handleLogin(e) {
+            if (e) e.preventDefault()
+            clearFormMessage()
+            clearFieldError('email')
+            clearFieldError('password')
+            const email = document.getElementById('email').value.trim()
+            const password = document.getElementById('password').value.trim()
+            if (!email) return setFieldError('email', 'E-mail obrigatório')
+            if (!validateEmail(email)) return setFieldError('email', 'E-mail inválido')
+            if (!password) return setFieldError('password', 'Senha obrigatória')
+            try {
+                const r = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+                localStorage.setItem('gh_token', r.token)
+                showFormMessage('success', 'Login efetuado — redirecionando...')
+                setTimeout(() => location.href = 'index.html', 700)
+            } catch (e) {
+                console.error('Login error', e)
+                // Falha de fetch costuma ser CORS/preflight ou servidor inacessível
+                if (e && String(e.message || '').includes('Failed to fetch')) {
+                    showFormMessage('error', 'Falha de rede/CORS. Tentando login sem credenciais...')
+                    try {
+                        const resp = await fetch(API + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }), credentials: 'omit' })
+                        if (!resp.ok) {
+                            const txt = await resp.text().catch(()=>resp.statusText)
+                            showFormMessage('error', 'Falha ao tentar sem credenciais: ' + (txt || resp.statusText))
+                        } else {
+                            const jr = await resp.json()
+                            localStorage.setItem('gh_token', jr.token)
+                            showFormMessage('success', 'Login efetuado (fallback) — redirecionando...')
+                            setTimeout(() => location.href = 'index.html', 700)
+                        }
+                    } catch (e2) {
+                        console.error('Login fallback error', e2)
+                        showFormMessage('error', 'Erro: ' + (e2.message || e2))
+                    }
+                } else {
+                    showFormMessage('error', 'Erro: ' + e.message)
+                }
+            }
+        }
+
+        async function handleRecover() {
+            clearFormMessage()
+            clearFieldError('email')
+            clearFieldError('password')
+            const email = document.getElementById('email').value.trim()
+            const newPassword = document.getElementById('password').value.trim()
+            const hint = document.getElementById('passwordHint')
+            // If user hasn't provided a new password yet, prompt them to type it
+            if (!email) return setFieldError('email', 'Informe o e-mail para recuperação')
+            if (!newPassword) {
+                hint.textContent = 'Digite a nova senha e clique novamente em Recuperar.'
+                document.getElementById('password').placeholder = 'Nova senha'
+                document.getElementById('password').focus()
+                return
+            }
+            if (!validatePassword(newPassword)) return setFieldError('password', 'Senha deve ter ao menos 6 caracteres')
+            try {
+                await api('/api/auth/recover', { method: 'POST', body: JSON.stringify({ email, newPassword }) })
+                showFormMessage('success', 'Senha atualizada com sucesso')
+                hint.textContent = ''
+            } catch (e) {
+                console.error('Recover error', e)
+                if (e && String(e.message || '').includes('Failed to fetch')) {
+                    showFormMessage('error', 'Falha de rede/CORS ao recuperar senha. Tente novamente após verificar o servidor.')
+                } else {
+                    showFormMessage('error', 'Erro: ' + e.message)
+                }
+            }
+        }
+
+        document.getElementById('btnRegister').addEventListener('click', handleRegister)
+        document.getElementById('loginForm').addEventListener('submit', handleLogin)
+        document.getElementById('btnRecover').addEventListener('click', handleRecover)
+        try { document.getElementById('googleLoginBtn').addEventListener('click', () => { window.location.href = API + '/api/auth/google' }) } catch(e) {}
+    </script>
+</body>
+
+</html>

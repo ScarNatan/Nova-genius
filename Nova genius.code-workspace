@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../Nova genius"
+		},
+		{
+			"path": "../../../../../Genius_Hub"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Nova genius"
+	}
+}

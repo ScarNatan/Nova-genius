@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área da Empresa Avaliação de Candidatos </title>
+    
+    <link rel="stylesheet" href="StyleAreaempresas.css">
+    
+    <link rel="shortcut icon" href="/Genius-hub/img/favicon.ico" type="image/x-icon"> 
+</head>
+<body>
+    
+    <header class="navbar">
+        <span>Área da Empresa</span>
+        
+        <nav>
+            <a href="home.html">Minha Conta</a>
+            <a href="home.html">Sair</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <h1>Desafios para Avaliação de Estudantes</h1>
+
+        <article class="card">
+            <h2>Desafio 1: Página de Login Responsiva</h2>
+            <p>Crie uma página de login utilizando HTML, CSS e JavaScript, com validação de campos e responsividade para diferentes dispositivos.</p>
+            
+            <button onclick="verRespostas('Desafio 1')">Ver Respostas</button>
+            <div id="respostasDesafio1" class="respostas-container"></div>
+        </article>
+
+        <article class="card">
+            <h2>Desafio 2: API de Tarefas em Node.js</h2>
+            <p>Desenvolva uma API REST em Node.js que permita cadastrar, listar, editar e excluir tarefas. Os dados podem ser armazenados em memória.</p>
+            <button onclick="verRespostas('Desafio 2')">Ver Respostas</button>
+            <div id="respostasDesafio2" class="respostas-container"></div>
+        </article>
+
+        <article class="card">
+            <h2>Desafio 3: Tela de Cadastro de Currículo</h2>
+            <p>Implemente uma tela para cadastro de currículo com campos de nome, curso, experiência e upload de PDF. Validação obrigatória no formulário.</p>
+            <button onclick="verRespostas('Desafio 3')">Ver Respostas</button>
+            <div id="respostasDesafio3" class="respostas-container"></div>
+        </article>
+
+        <article class="card">
+            <h2>Desafio 4: Proposta de Solução Digital</h2>
+            <p>Descreva uma solução digital para ajudar equipes de projeto a se organizarem de forma mais eficiente. Pode ser um protótipo ou proposta conceitual.</p>
+            <button onclick="verRespostas('Desafio 4')">Ver Respostas</button>
+            <div id="respostasDesafio4" class="respostas-container"></div>
+        </article>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Genius HUB. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Função para carregar as respostas de um desafio
+        function verRespostas(desafio) {
+            // Cria o ID de destino (ex: 'respostasDesafio1')
+            const idTarget = `respostas${desafio.replace(/ /g, '')}`;
+            const divRespostas = document.getElementById(idTarget);
+
+            // Verifica se a div existe para evitar erros
+            if (!divRespostas) {
+                console.error(`Elemento de resposta não encontrado para: ${desafio}`);
+                return;
+            }
+
+            // Limpa o conteúdo e adiciona uma mensagem de carregamento
+            divRespostas.innerHTML = '<p class="loading-msg">Carregando respostas...</p>'; 
+
+            fetch(`http://localhost:3000/respostas/${encodeURIComponent(desafio)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro de rede: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    divRespostas.innerHTML = ''; // Limpar o loading
+                    
+                    if (data.length === 0) {
+                        divRespostas.innerHTML = '<p class="no-answer">Nenhuma resposta ainda.</p>';
+                    } else {
+                        data.forEach(resposta => {
+                            const respostaDiv = document.createElement('div');
+                            respostaDiv.classList.add('resposta');
+                            respostaDiv.innerHTML = `
+                                <h4>Resposta de ${resposta.aluno}</h4>
+                                <p><strong>Detalhes:</strong> ${resposta.resposta}</p>
+                                <p><small>Enviado em: ${resposta.timestamp}</small></p>
+                            `;
+                            divRespostas.appendChild(respostaDiv);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar respostas:', error);
+                    divRespostas.innerHTML = `<p class="error-msg">Erro ao carregar respostas: ${error.message}</p>`;
+                });
+        }
+    </script>
+</body>
+</html>

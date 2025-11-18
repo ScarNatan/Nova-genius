@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Aluno - Genius Hub</title>
+  <link rel="stylesheet" href="style-aluno.css">
+  <link rel="shortcut icon" href="img/Genius-Hub-img.ico.ico" type="image/x-icon">
+</head>
+<body>
+
+  <header>
+    <div class="logo">Genius Hub</div>
+    <nav>
+      <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Competições</a></li>
+        <li><a href="#">Ranking</a></li>
+        <li><a href="#">Perfil</a></li>
+        <li><a href="index.html" class="logout">Sair</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="perfil">
+      <label for="fotoPerfil" style="cursor: pointer;">
+        <img src="avatar.png" alt="Avatar do aluno" id="avatarPreview" style="width: 120px; height: 120px; border-radius: 50%;">
+      </label>
+      <input type="file" id="fotoPerfil" accept="image/*" style="display: none">
+      <div class="info">
+        <h2>Bem-vindo, Aluno!</h2>
+        <p>Instituição: ????</p>
+        <p>Pontuação: <strong>000</strong> pontos</p>
+        <p>Ranking Atual: <strong>0 lugar</strong></p>
+      </div>
+    </section>
+
+    <section class="desafios">
+      <h2>Seus Desafios</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Página de Login</h3>
+          <p>Status: <span class="status enviado">Enviado</span></p>
+          <button onclick="verResposta()">Ver Resposta</button>
+        </div>
+        <div class="card">
+          <h3>API de Tarefas</h3>
+          <p>Status: <span class="status pendente">Pendente</span></p>
+          <input type="file" class="upload" style="margin-top: 10px;">
+          <button onclick="enviarResposta(this)">Enviar Resposta</button>
+        </div>
+        <div class="card">
+          <h3>Cadastro de Currículo</h3>
+          <p>Status: <span class="status pendente">Pendente</span></p>
+          <input type="file" class="upload" style="margin-top: 10px;">
+          <button onclick="enviarResposta(this)">Enviar Resposta</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 Genius Hub - Todos os direitos reservados.
+  </footer>
+
+  
+</body>
+</html>
+
+    
+   <script src="script.áreadoaluno.js"></script>
+</body>
+</html>
