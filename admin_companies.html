@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin • Empresas • Genius Hub</title>
+  <link rel="shortcut icon" href="img/Genius-Hub-img.ico.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Small overrides to adapt to global theme */
+    body { margin: 0; padding: 20px; }
+    .container { max-width: 1100px; margin: 18px auto; padding: 18px; background: rgba(18,23,48,.9); border: 1px solid var(--border); border-radius: 12px }
+    h1 { margin: 0 0 12px }
+    table { width: 100%; border-collapse: collapse; color: #e5e7eb }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left }
+    thead th { font-weight: 700 }
+    .muted { color: var(--muted); font-size: 13px }
+    .actions { display: flex; gap: 8px; align-items: center }
+    .btn { background: linear-gradient(90deg,var(--blue),var(--purple)); padding: 8px 12px; border-radius: 8px; color: #fff; border: 0; cursor: pointer }
+    .error { color: #f87171 }
+    @media(max-width:800px){ .container{padding:12px} th,td{padding:8px} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Empresas cadastradas</h1>
+    <div class="actions">
+      <button id="refresh" class="btn">Atualizar</button>
+      <button id="logout" class="btn" style="background:#ef4444">Logout</button>
+      <div style="flex:1"></div>
+      <div class="muted">Apenas admins podem acessar esta página via token/cookie.</div>
+    </div>
+    <div id="msg" style="margin-top:12px"></div>
+    <div style="margin-top:12px;overflow:auto"><table id="tbl"><thead><tr><th>Empresa</th><th>E-mail</th><th>CNPJ</th><th>Contato</th><th>Cadastro</th></tr></thead><tbody></tbody></table></div>
+  </div>
+<script>
+  const API = 'http://localhost:3001'
+  function token(){return localStorage.getItem('gh_token')||''}
+  async function fetchCompanies(){
+    const msg = document.getElementById('msg'); msg.textContent = ''
+    try{
+      const headers = {'Content-Type':'application/json', ...(token()?{Authorization:'Bearer '+token()}: {})}
+      const res = await fetch(API + '/api/admin/companies', { method: 'GET', credentials: 'include', headers })
+      if (!res.ok) {
+        const txt = await res.text().catch(()=>res.statusText)
+        msg.innerHTML = '<div class="error">Erro: '+ (txt||res.statusText) +'</div>'
+        return
+      }
+      const arr = await res.json()
+      const tbody = document.querySelector('#tbl tbody'); tbody.innerHTML = ''
+      arr.forEach(c => {
+        const tr = document.createElement('tr')
+        tr.innerHTML = `<td>${(c.company||'--')}</td><td>${(c.email||'--')}</td><td>${(c.cnpj||'--')}</td><td>${(c.contact||'--')}</td><td>${c.createdAt?new Date(c.createdAt).toLocaleString():'--'}</td>`
+        tbody.appendChild(tr)
+      })
+    }catch(e){
+      document.getElementById('msg').innerHTML = '<div class="error">Erro: '+(e.message||e)+'</div>'
+    }
+  }
+  document.getElementById('refresh').addEventListener('click', fetchCompanies)
+  document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('gh_token'); location.reload() })
+  // load on open
+  fetchCompanies()
+</script>
+</body>
+</html>

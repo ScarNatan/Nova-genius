@@ -35,6 +35,19 @@
       "avatar": "",
       "points": 0,
       "achievements": []
+    },
+    {
+      "id": "d4a7a49e-886a-4380-be24-2f5161830257",
+      "email": "scarking68@gmail.com",
+      "passwordHash": "b88c00411afc99affe48b78d875f49fe:0c31caa68d89e60b62c37d6f23984a1f542556e9b8c43b8829cfd01a9dc340ea",
+      "role": "admin",
+      "name": "",
+      "institution": "",
+      "bio": "",
+      "avatar": "",
+      "points": 0,
+      "achievements": [],
+      "createdAt": 1764037280757
     }
   ],
   "challenges": [],
@@ -76,5 +89,6 @@
       "authorId": "23fde60d-b3fb-4599-9fcc-fecd4c1923da"
     }
   ],
-  "project_comments": []
+  "project_comments": [],
+  "conversations": []
 }

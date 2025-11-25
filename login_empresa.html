@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar • Empresa • Genius Hub</title>
+    <link rel="shortcut icon" href="img/Genius-Hub-img.ico.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--blue:#2563eb;--purple:#7c3aed;--bg:#0b1020;--border:#1f2540;--muted:#9aa4b2}
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1020 0%,#0e1430 100%);color:#e5e7eb;display:flex;flex-direction:column;min-height:100vh;align-items:center;justify-content:center;padding:16px}
+        .container{width:100%;max-width:640px;background:rgba(18,23,48,.9);border:1px solid var(--border);border-radius:16px;padding:20px}
+        .brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+        .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple))}
+        .title{font-weight:700;font-size:18px}
+        .row{display:flex;gap:10px;margin-top:10px}
+        .input,.select{width:100%;background:#0c1228;border:1px solid var(--border);border-radius:10px;padding:12px;color:#fff}
+        .btn{background:linear-gradient(90deg,var(--blue),var(--purple));border:0;border-radius:10px;padding:12px 14px;color:#fff;font-weight:600;cursor:pointer}
+        .muted{color:var(--muted);font-size:12px}
+        .actions{display:flex;gap:10px;margin-top:12px}
+        .links{display:flex;justify-content:space-between;margin-top:10px}
+        @media(max-width:480px){.row{flex-direction:column}.container{padding:16px}.title{font-size:16px}}
+    footer {
+    /* Fundo Escuro para contrastar com o texto claro */
+    background-color: #072a50; /* Azul Marinho Escuro (igual à navbar) */
+    color: #ecf0f1; /* Texto Claro */
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 410px; /* Garante que haja espaço acima do rodapé */
+    width: 100%; /* Ocupa toda a largura */
+}
+
+footer p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="brand">
+            <div class="logo"></div>
+            <div class="title">Entrar / Cadastrar — Empresa</div>
+        </div>
+        <form id="loginForm" autocomplete="on">
+            <div class="row"><input id="company" class="input" placeholder="Nome da empresa (apenas cadastro)"></div>
+            <div class="row"><input id="cnpj" class="input" placeholder="CNPJ (somente números)"></div>
+            <div class="row"><input id="email" type="email" class="input" placeholder="E-mail" required></div>
+            <div class="row"><input id="password" type="password" class="input" placeholder="Senha" required></div>
+            <div class="row"><input id="contact" class="input" placeholder="Pessoa de contato (opcional)"></div>
+            <div id="formMessage" style="margin-top:12px"></div>
+            <div class="actions"><button id="btnLogin" type="submit" class="btn">Entrar</button><button id="btnRegister" type="button" class="btn" style="background:linear-gradient(90deg,#16a34a,#22c55e)">Cadastrar</button><button id="btnRecover" type="button" class="btn" style="background:linear-gradient(90deg,#f59e0b,#f97316)">Recuperar senha</button></div>
+            <div style="margin-top:10px"><button id="googleLoginBtn" type="button" class="btn" style="background:linear-gradient(90deg,#4285F4,#3367D6);display:flex;align-items:center;gap:8px"><span style="font-weight:700">Entrar com Google</span></button></div>
+        </form>
+        <div class="links"><a href="index.html" class="muted" style="text-decoration:none">Voltar</a><span class="muted">Conta Empresa</span></div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3001'
+        function token(){return localStorage.getItem('gh_token')||''}
+        async function api(path, opts={}){
+            const headers = {'Content-Type':'application/json', ...(token()?{Authorization:'Bearer '+token()}: {})}
+            const res = await fetch(API+path, {...opts, credentials:'include', headers:{...headers, ...(opts.headers||{})}})
+            if(!res.ok){const t = await res.text().catch(()=>res.statusText); throw new Error(t||res.statusText||'Erro')}
+            const ct = res.headers.get('content-type')||''
+            return ct.includes('application/json')?res.json():res.text()
+        }
+
+        function validateEmail(email){return /^[^\s@]+@[^^\s@]+\.[^\s@]+$/.test(email)}
+        function validatePassword(pw){return pw && pw.length>=6}
+        function sanitizeCNPJ(v){return (v||'').replace(/[^0-9]/g,'')}
+        function validateCNPJ(cnpj) {
+            cnpj = sanitizeCNPJ(cnpj)
+            if (!cnpj || cnpj.length !== 14) return false
+            if (/^(\d)\1+$/.test(cnpj)) return false
+            const calc = (cnp, pos) => {
+                const nums = cnp.slice(0, pos).split('').map(Number)
+                let factor = pos - 7
+                let sum = 0
+                for (let i = nums.length - 1; i >= 0; i--) {
+                    sum += nums[i] * factor
+                    factor = factor === 2 ? 9 : factor - 1
+                }
+                const res = sum % 11
+                return res < 2 ? 0 : 11 - res
+            }
+            const d1 = calc(cnpj, 12)
+            const d2 = calc(cnpj, 13)
+            return Number(cnpj[12]) === d1 && Number(cnpj[13]) === d2
+        }
+        function formatCNPJInput(v) {
+            const s = sanitizeCNPJ(v)
+            const parts = [s.slice(0,2), s.slice(2,5), s.slice(5,8), s.slice(8,12), s.slice(12,14)]
+            return parts.filter(p=>p).map((p,i)=> (i===4?p: p)).join(i=>i)
+        }
+
+        async function handleRegister(){
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const cnpjRaw = document.getElementById('cnpj').value;
+            const cnpj = sanitizeCNPJ(cnpjRaw);
+            const contact = document.getElementById('contact').value.trim();
+            if(!email) return alert('E-mail obrigatório');
+            if(!validateEmail(email)) return alert('E-mail inválido');
+            if(!validatePassword(password)) return alert('Senha deve ter ao menos 6 caracteres');
+            if (!validateCNPJ(cnpj)) return alert('CNPJ inválido')
+            try{
+                const r = await api('/api/auth/register',{method:'POST', body:JSON.stringify({email,password,role:'empresa',company,cnpj,contact})})
+                if (r && r.token) localStorage.setItem('gh_token', r.token)
+                alert('Cadastro realizado — redirecionando...')
+                setTimeout(()=>location.href='área_empresas.html',600)
+            }catch(e){
+                console.error('Register',e)
+                alert('Erro ao cadastrar: ' + (e.message||e))
+            }
+        }
+
+        async function handleLogin(e){
+            if(e) e.preventDefault()
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if(!email) return alert('E-mail obrigatório');
+            if(!validateEmail(email)) return alert('E-mail inválido');
+            if(!password) return alert('Senha obrigatória');
+            try{
+                const r = await api('/api/auth/login',{method:'POST', body:JSON.stringify({email,password})})
+                if (r && r.token) localStorage.setItem('gh_token', r.token)
+                alert('Login efetuado — redirecionando...')
+                setTimeout(()=>location.href='área_empresas.html',600)
+            }catch(e){
+                console.error('Login',e)
+                alert('Erro ao logar: '+(e.message||e))
+            }
+        }
+
+        async function handleRecover(){
+            const email = document.getElementById('email').value.trim();
+            const newPassword = document.getElementById('password').value.trim();
+            if(!email) return alert('Informe o e-mail para recuperação');
+            if(!newPassword) return alert('Digite a nova senha no campo Senha e clique em Recuperar')
+            try{await api('/api/auth/recover',{method:'POST', body:JSON.stringify({email,newPassword})});alert('Senha atualizada com sucesso')}catch(e){console.error('Recover',e);alert('Erro: '+(e.message||e))}
+        }
+
+        document.getElementById('btnRegister').addEventListener('click', handleRegister)
+        document.getElementById('loginForm').addEventListener('submit', handleLogin)
+        document.getElementById('btnRecover').addEventListener('click', handleRecover)
+        try{document.getElementById('googleLoginBtn').addEventListener('click', ()=>{window.location.href=API+'/api/auth/google'})}catch(e){}
+    </script>
+    <footer style="width:100%;">&copy; 2025 Genius HUB. Todos os direitos reservados.</footer>
+</body>
+
+</html>

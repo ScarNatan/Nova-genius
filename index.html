@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
     <head>
+    <link rel="shortcut icon" href="img/Genius-Hub-img.ico.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
@@ -30,7 +31,10 @@
             margin: 0;
             font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             background: linear-gradient(180deg, #0b1020 0%, #0e1430 100%);
-            color: #e5e7eb
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .app {
@@ -548,9 +552,14 @@
                 <a href="#projetos"><i class="fas fa-project-diagram"></i><span>Projetos</span></a>
                 <a href="#gamificacao"><i class="fas fa-trophy"></i><span>Gamificação</span></a>
                 <a href="#desafios"><i class="fas fa-flag"></i><span>Desafios</span></a>
+                   <a id="adminLink" href="admin_companies.html" style="display:none"><i class="fas fa-building"></i><span>Admin Empresas</span></a>
                 <div class="section">Acesso</div>
                 <div class="cta">
-                    <button id="loginBtn"><i class="fab fa-google"></i> Entrar com Google</button>
+                        <button id="loginBtn"><i class="fab fa-google"></i> Entrar com Google</button>
+                        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+                            <button id="loginAlunoBtn" class="btn" style="background:linear-gradient(90deg,#2563eb,#7c3aed)">Entrar como Aluno</button>
+                            <button id="loginEmpresaBtn" class="btn" style="background:linear-gradient(90deg,#16a34a,#059669)">Entrar como Empresa</button>
+                        </div>
                 </div>
             </nav>
         </aside>
@@ -716,23 +725,7 @@
                                     id="askBtn">Perguntar</button></div>
                             <div id="aiResponses" class="messages" style="margin-top:8px"></div>
                         </div>
-                        <div id="projetos" class="card">
-                            <h3><i class="fas fa-project-diagram" style="color:var(--blue)"></i> Projetos colaborativos
-                            </h3>
-                            <div class="sub">Espaços compartilhados com uploads e versões</div>
-                            <div class="row" style="margin-bottom:10px"><select id="projectSelect"
-                                    class="select"></select></div>
-                            <div id="projFileList" class="board"></div>
-                            <div class="row" style="margin-top:10px"><input id="projFileInput" type="file" multiple
-                                    class="input"><button id="projUploadBtn" class="btn">Enviar arquivos</button></div>
-                            <div style="margin-top:10px">
-                                <h4 style="margin:8px 0">Comentários</h4>
-                                <div id="projComments" class="list"></div>
-                                <div class="row" style="margin-top:8px"><input id="projCommentInput" class="input"
-                                        placeholder="Escreva um comentário"><button id="projCommentBtn"
-                                        class="btn">Comentar</button></div>
-                            </div>
-                        </div>
+                        <!-- Projetos movidos para a área do aluno (áreadoaluno.html) -->
                         <div id="gamificacao" class="card">
                             <h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Gamificação</h3>
                             <div class="sub">Pontos e conquistas por participação</div>
@@ -929,6 +922,31 @@ function toggleSidebar() {
 
     </script>
     <script>
+        // role-based quick login buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            try { document.getElementById('loginAlunoBtn').addEventListener('click', () => { window.location.href = 'login_aluno.html' }) } catch(e) {}
+            try { document.getElementById('loginEmpresaBtn').addEventListener('click', () => { window.location.href = 'login_empresa.html' }) } catch(e) {}
+            try { document.getElementById('loginBtn').addEventListener('click', () => { window.location.href = 'teladelogin.html' }) } catch(e) {}
+        })
+    </script>
+    <script>
+        // show admin link when authenticated user is admin
+        (async function(){
+            try {
+                const API = 'http://localhost:3001'
+                const token = localStorage.getItem('gh_token') || ''
+                if (!token) return
+                const res = await fetch(API + '/api/users/me', { headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, credentials: 'include' })
+                if (!res.ok) return
+                const me = await res.json()
+                if (me && me.role === 'admin') {
+                    const a = document.getElementById('adminLink')
+                    if (a) a.style.display = 'flex'
+                }
+            } catch(e) {}
+        })()
+    </script>
+    <script>
         // Projetos colaborativos: carregar projetos, arquivos e comentários
         const API = 'http://localhost:3001'
         function token() { return localStorage.getItem('gh_token') || '' }
@@ -944,164 +962,7 @@ function toggleSidebar() {
             return ct.includes('application/json') ? res.json() : res.text()
         }
 
-        async function loadProjects() {
-            try {
-                const list = await api('/api/projects')
-                const sel = document.getElementById('projectSelect')
-                sel.innerHTML = ''
-                list.forEach(p => {
-                    const opt = document.createElement('option')
-                    opt.value = p.id
-                    opt.textContent = p.name
-                    sel.appendChild(opt)
-                })
-                if (list.length) {
-                    sel.value = list[0].id
-                    loadProjectDetails(list[0].id)
-                } else {
-                    document.getElementById('projFileList').innerHTML = '<div class="muted">Nenhum projeto encontrado.</div>'
-                }
-            } catch (e) {
-                console.error('Erro carregando projetos', e)
-                // mostrar mensagens úteis e oferecer tentar novamente ou tentar sem credenciais
-                const filesEl = document.getElementById('projFileList')
-                filesEl.innerHTML = ''
-                const errDiv = document.createElement('div')
-                errDiv.className = 'muted'
-                errDiv.textContent = 'Erro carregando projetos.'
-                filesEl.appendChild(errDiv)
-                const btnRow = document.createElement('div')
-                btnRow.style.marginTop = '8px'
-                const retry = document.createElement('button')
-                retry.className = 'btn'
-                retry.textContent = 'Tentar novamente'
-                retry.onclick = () => { filesEl.innerHTML = 'Carregando...'; loadProjects() }
-                const fallback = document.createElement('button')
-                fallback.style.marginLeft = '8px'
-                fallback.className = 'btn'
-                fallback.textContent = 'Tentar sem credenciais'
-                fallback.onclick = async () => {
-                    filesEl.innerHTML = 'Tentando sem credenciais...'
-                    try {
-                        await loadProjectsFallback()
-                    } catch (err2) {
-                        filesEl.innerHTML = '<div class="muted">Falha ao carregar sem credenciais</div>'
-                    }
-                }
-                btnRow.appendChild(retry)
-                btnRow.appendChild(fallback)
-                filesEl.appendChild(btnRow)
-            }
-        }
-
-        // Fallback: tenta buscar projetos sem enviar cookies/credenciais (útil se CORS credentialed estiver bloqueando)
-        async function loadProjectsFallback() {
-            const sel = document.getElementById('projectSelect')
-            const filesEl = document.getElementById('projFileList')
-            try {
-                const r = await fetch(API + '/api/projects', { credentials: 'omit' })
-                if (!r.ok) {
-                    const t = await r.text().catch(()=>r.statusText)
-                    throw new Error(t || 'Erro')
-                }
-                const list = await r.json()
-                sel.innerHTML = ''
-                list.forEach(p => {
-                    const opt = document.createElement('option')
-                    opt.value = p.id
-                    opt.textContent = p.name
-                    sel.appendChild(opt)
-                })
-                if (list.length) {
-                    sel.value = list[0].id
-                    loadProjectDetails(list[0].id)
-                } else {
-                    filesEl.innerHTML = '<div class="muted">Nenhum projeto encontrado.</div>'
-                }
-            } catch (e) {
-                console.error('Fallback falhou', e)
-                throw e
-            }
-        }
-
-        async function loadProjectDetails(projectId) {
-            const filesEl = document.getElementById('projFileList')
-            const commentsEl = document.getElementById('projComments')
-            filesEl.innerHTML = 'Carregando...'
-            commentsEl.innerHTML = 'Carregando...'
-            try {
-                const files = await api(`/api/projects/${projectId}/files`)
-                filesEl.innerHTML = ''
-                if (!files.length) {
-                    filesEl.innerHTML = '<div class="muted">Nenhum arquivo</div>'
-                } else {
-                    files.forEach(f => {
-                        const div = document.createElement('div')
-                        div.className = 'file'
-                        div.innerHTML = `<div>${f.name} <div class="sub" style="font-size:12px">v${f.version} • ${new Date(f.createdAt||0).toLocaleString()}</div></div><div>${f.path?`<a href="${f.path}" target="_blank" style="color:#9aa4b2;text-decoration:none">Baixar</a>`:''}</div>`
-                        filesEl.appendChild(div)
-                    })
-                }
-            } catch (e) {
-                filesEl.innerHTML = '<div class="muted">Erro carregando arquivos</div>'
-            }
-            try {
-                const comments = await api(`/api/projects/${projectId}/comments`)
-                commentsEl.innerHTML = ''
-                if (!comments.length) commentsEl.innerHTML = '<div class="muted">Nenhum comentário</div>'
-                comments.forEach(c => {
-                    const div = document.createElement('div')
-                    div.className = 'item'
-                    div.innerHTML = `<div class="meta"><div>${c.text}</div></div><div class="sub">${new Date(c.ts||0).toLocaleString()}</div>`
-                    commentsEl.appendChild(div)
-                })
-            } catch (e) {
-                commentsEl.innerHTML = '<div class="muted">Erro carregando comentários</div>'
-            }
-        }
-
-        document.getElementById('projectSelect').addEventListener('change', (e) => loadProjectDetails(e.target.value))
-
-        // Upload de arquivos: converte para dataURL e envia como attachments
-        document.getElementById('projUploadBtn').addEventListener('click', async () => {
-            const input = document.getElementById('projFileInput')
-            const sel = document.getElementById('projectSelect')
-            const pid = sel.value
-            if (!pid) return alert('Selecione um projeto')
-            const files = Array.from(input.files || [])
-            if (!files.length) return alert('Selecione arquivos')
-            try {
-                const attachments = await Promise.all(files.map(f => new Promise((res, rej) => {
-                    const fr = new FileReader()
-                    fr.onload = () => res({ name: f.name, dataUrl: fr.result })
-                    fr.onerror = rej
-                    fr.readAsDataURL(f)
-                })))
-                await api(`/api/projects/${pid}/files`, { method: 'POST', body: JSON.stringify({ attachments }) })
-                alert('Arquivos enviados')
-                input.value = ''
-                loadProjectDetails(pid)
-            } catch (e) {
-                console.error(e)
-                alert('Erro ao enviar: ' + e.message)
-            }
-        })
-
-        // Comentar
-        document.getElementById('projCommentBtn').addEventListener('click', async () => {
-            const input = document.getElementById('projCommentInput')
-            const text = input.value.trim()
-            const pid = document.getElementById('projectSelect').value
-            if (!text) return alert('Escreva um comentário')
-            try {
-                await api(`/api/projects/${pid}/comments`, { method: 'POST', body: JSON.stringify({ text }) })
-                input.value = ''
-                loadProjectDetails(pid)
-            } catch (e) {
-                console.error(e)
-                alert('Erro ao enviar comentário: ' + e.message)
-            }
-        })
+        
 
         // Inicializa
         // Botão de login com Google — abre fluxo OAuth no backend
@@ -1190,8 +1051,9 @@ function toggleSidebar() {
             })
         } catch(e) {}
 
-        loadProjects()
+        
     </script>
+    <footer>&copy; 2025 Genius HUB. Todos os direitos reservados.</footer>
     </body>
 
 </html>

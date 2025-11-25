@@ -63,6 +63,32 @@ function checkPassword(p, stored) {
 }
 function uuid() { return crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36)+Math.random().toString(36).slice(2)) }
 
+function sanitizeCNPJ(input) {
+  if (!input) return ''
+  return String(input).replace(/[^0-9]/g, '')
+}
+
+function validateCNPJ(cnpj) {
+  cnpj = sanitizeCNPJ(cnpj)
+  if (!cnpj || cnpj.length !== 14) return false
+  // reject known invalid sequences
+  if (/^(\d)\1+$/.test(cnpj)) return false
+  const calcDigit = (cnpj, pos) => {
+    const nums = cnpj.slice(0, pos).split('').map(Number)
+    let factor = pos - 7
+    let sum = 0
+    for (let i = nums.length - 1; i >= 0; i--) {
+      sum += nums[i] * factor
+      factor = factor === 2 ? 9 : factor - 1
+    }
+    const res = sum % 11
+    return res < 2 ? 0 : 11 - res
+  }
+  const d1 = calcDigit(cnpj, 12)
+  const d2 = calcDigit(cnpj, 13)
+  return Number(cnpj[12]) === d1 && Number(cnpj[13]) === d2
+}
+
 function send(res, status, data, headers={}) {
   const body = typeof data === 'string' ? data : JSON.stringify(data)
   // preserve any CORS headers previously set on the response (so credentialed requests keep the proper origin)
@@ -188,15 +214,25 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && url.pathname === '/api/auth/register') {
     const body = await parseBody(req)
-    const { email, password, role = 'aluno', name = '', institution = '' } = body
+    const { email, password, role = 'aluno', name = '', institution = '', company = '', cnpj = '', contact = '' } = body
     if (!email || !password) return send(res, 400, { error: 'missing_fields' })
     if (db.users.find(u => u.email === email)) return send(res, 409, { error: 'email_exists' })
     const hash = hashPassword(password)
-    const u = { id: uuid(), email, passwordHash: hash, role, name, institution, bio: '', avatar: '', points: 0, achievements: [] }
+    // include company-specific fields when role is empresa
+    const u = { id: uuid(), email, passwordHash: hash, role, name, institution, bio: '', avatar: '', points: 0, achievements: [], createdAt: Date.now() }
+    if (role === 'empresa') {
+      const clean = sanitizeCNPJ(cnpj || '')
+      if (!validateCNPJ(clean)) return send(res, 400, { error: 'invalid_cnpj' })
+      u.company = company || ''
+      u.cnpj = clean
+      u.contact = contact || ''
+    }
     db.users.push(u); writeDB(db)
     const token = signJWT({ sub: u.id, role: u.role }, JWT_SECRET, { expiresIn: 7*24*3600 })
     const maxAge = 7*24*3600
-    return send(res, 200, { token, user: { id: u.id, email, role, name, institution } }, { 'Set-Cookie': `gh_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax` })
+    const userResp = { id: u.id, email, role, name: u.name, institution: u.institution }
+    if (role === 'empresa') { userResp.company = u.company; userResp.cnpj = u.cnpj; userResp.contact = u.contact }
+    return send(res, 200, { token, user: userResp }, { 'Set-Cookie': `gh_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax` })
   }
 
   if (req.method === 'POST' && url.pathname === '/api/auth/login') {
@@ -207,7 +243,9 @@ const server = http.createServer(async (req, res) => {
     if (!checkPassword(password||'', u.passwordHash)) return send(res, 401, { error: 'invalid_credentials' })
     const token = signJWT({ sub: u.id, role: u.role }, JWT_SECRET, { expiresIn: 7*24*3600 })
     const maxAge = 7*24*3600
-    return send(res, 200, { token, user: { id: u.id, email: u.email, role: u.role, name: u.name, institution: u.institution } }, { 'Set-Cookie': `gh_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax` })
+    const userResp = { id: u.id, email: u.email, role: u.role, name: u.name, institution: u.institution }
+    if (u.role === 'empresa') { userResp.company = u.company || ''; userResp.cnpj = u.cnpj || ''; userResp.contact = u.contact || '' }
+    return send(res, 200, { token, user: userResp }, { 'Set-Cookie': `gh_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax` })
   }
 
   if (req.method === 'POST' && url.pathname === '/api/auth/recover') {
@@ -222,8 +260,17 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && url.pathname === '/api/users/me') {
     if (!user) return send(res, 401, { error: 'missing_token' })
-    const { id, email, role, name, institution, bio, avatar, points, achievements } = user
-    return send(res, 200, { id, email, role, name, institution, bio, avatar, points, achievements })
+    const { id, email, role, name, institution, bio, avatar, points, achievements, company, cnpj, contact } = user
+    const resp = { id, email, role, name, institution, bio, avatar, points, achievements }
+    if (role === 'empresa') { resp.company = company || ''; resp.cnpj = cnpj || ''; resp.contact = contact || '' }
+    return send(res, 200, resp)
+  }
+
+  // Admin: list registered companies
+  if (req.method === 'GET' && url.pathname === '/api/admin/companies') {
+    if (!user || user.role !== 'admin') return send(res, 403, { error: 'forbidden' })
+    const companies = db.users.filter(u => u.role === 'empresa').map(u => ({ id: u.id, email: u.email, company: u.company || '', cnpj: u.cnpj || '', contact: u.contact || '', createdAt: u.createdAt || null }))
+    return send(res, 200, companies)
   }
 
   if (req.method === 'PUT' && url.pathname === '/api/users/me') {
